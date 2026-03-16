@@ -9,7 +9,7 @@ Which is:
 var path = require('path');
 var compare = require('node-version-compare');
 var ConfigXmlHelper = require('../configXmlHelper.js');
-var IOS_DEPLOYMENT_TARGET = '8.0';
+var IOS_DEPLOYMENT_TARGET = '13.0';
 var COMMENT_KEY = /_comment$/;
 var context;
 
@@ -146,10 +146,10 @@ function loadProjectFile() {
       platform_ios = context.requireCordovaModule('cordova-lib/src/plugman/platforms/ios');
       projectFile = platform_ios.parseProjectFile(iosPlatformPath());
     } catch(e) {
-      // try cordova 7.0 structure
+      // try cordova 8.0 structure
       var iosPlatformApi = require(path.join(iosPlatformPath(), '/cordova/Api'));
-      var projectFileApi = require(path.join(iosPlatformPath(), '/cordova/lib/projectFile.js'));
-      var locations = (new iosPlatformApi()).locations;
+      var projectFileApi = require(path.join(iosPlatformPath(), '../../node_modules/cordova-ios/lib/projectFile.js'));
+      var locations = (new iosPlatformApi('ios', iosPlatformPath())).locations;
       projectFile = projectFileApi.parse(locations);      
     }
   }
@@ -189,11 +189,10 @@ function projectRoot() {
 }
 
 function pathToEntitlementsFile() {
-  var configXmlHelper = new ConfigXmlHelper(context),
-    projectName = configXmlHelper.getProjectName(),
-    fileName = projectName + '.entitlements';
-
-  return path.join(projectName, 'Resources', fileName);
+  var configXmlHelper = new ConfigXmlHelper(context);
+  var projectName = configXmlHelper.getProjectName();
+  entitlementsFilePath = path.join(projectRoot(), 'platforms', 'ios', 'App', 'Resources', projectName + '.entitlements');
+  return entitlementsFilePath;
 }
 
 // endregion
